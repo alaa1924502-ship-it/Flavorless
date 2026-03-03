@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BrightMind</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="mission">
+        <h3>🌍 Together for Peace</h3>
+        <p>Say NO to bullying. Say YES to kindness.</p>
+        <div class="icons-row">
+            🕊️ ✌️ 🤝 🚫😡 🌿
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage">
+        <h2 id="title">Welcome to BrightMind</h2>
+        <input type="text" id="studentName" placeholder="Enter your name">
+        <button onclick="login()" id="loginBtn">Log In</button>
+    </div>
+<progress id="loginProgress" value="0" max="100" style="width:70%; display:none;"></progress>
+<progress id="loginProgress" value="0" max="100" style="width:70%; display:none; height:15px; border-radius:8px;"></progress>
+    <!-- Main App -->
+    <div id="app" style="display:none;">
+        <div id="header">
+            <span id="welcome"></span>
+            <select id="lang" onchange="updateLanguage()">
+                <option value="en">English</option>
+                <option value="ar">عربي</option>
+                <option value="fr">Français</option>
+                <option value="es">Español</option>
+            </select>
+        </div>
+
+        <div id="chatBox"></div>
+        <input type="text" id="userMessage" placeholder="Type your message...">
+        <button onclick="sendMessage()" id="sendBtn">Send</button>
+
+        <div class="dashboard" id="dashboard">
+            <h3 id="dashTitle">📊 Counselor Dashboard</h3>
+            <p id="filterText">Filter by Risk Level: 
+                <select id="riskFilter" onchange="updateStudentTable()">
+                    <option value="all">All</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </p>
+
+            <div class="table-container">
+                <table>
+                    <thead><tr><th id="thStudent">Student</th><th id="thRisk">Risk</th><th id="thPoints">Points</th><th id="thMood">Last Mood</th></tr></thead>
+                    <tbody id="studentTable"></tbody>
+                </table>
+            </div>
+            <canvas id="moodChart" width="600" height="200"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+// ---- Variables ----
+let currentLang = 'en';
+let studentName = '';
+let students = {}; // All students data
+const moodIcons = {happy:'😊', sad:'😔', angry:'😡', neutral:'😐'};
+
+const translations = {
+en:{
+title:"Welcome to BrightMind", login:"Log In", placeholder:"Enter your name", send:"Send",
+filter:"Filter by Risk Level:", dashTitle:"📊 Counselor Dashboard",
+thStudent:"Student", thRisk:"Risk", thPoints:"Points", thMood:"Last Mood"
+},
+ar:{
+title:"مرحبًا بك في BrightMind", login:"تسجيل الدخول", placeholder:"ادخل اسمك", send:"إرسال",
+filter:"تصفية حسب مستوى الخطر:", dashTitle:"📊 لوحة المستشار",
+thStudent:"الطالب", thRisk:"الخطر", thPoints:"النقاط", thMood:"آخر مزاج"
+},
+fr:{
+title:"Bienvenue sur BrightMind", login:"Connexion", placeholder:"Entrez votre nom", send:"Envoyer",
+filter:"Filtrer par niveau de risque:", dashTitle:"📊 Tableau du conseiller",
+thStudent:"Étudiant", thRisk:"Risque", thPoints:"Points", thMood:"Dernier humeur"
+},
+es:{
+title:"Bienvenido a BrightMind", login:"Iniciar sesión", placeholder:"Ingrese su nombre", send:"Enviar",
+filter:"Filtrar por nivel de riesgo:", dashTitle:"📊 Panel del consejero",
+thStudent:"Estudiante", thRisk:"Riesgo", thPoints:"Puntos", thMood:"Último estado de ánimo"
+}
+};
+
+// ---- Login ----
+function login(){
+    studentName = document.getElementById('studentName').value.trim();
+    if(!studentName) return alert("Enter your name");
+
+    // إظهار شريط التقدم
+    const progress = document.getElementById('loginProgress');
+    progress.style.display = 'block';
+    progress.value = 0;
+
+    let studentsInterval = setInterval(()=>{
+        if(progress.value < 100){
+            progress.value += 5; // زود القيمة تدريجياً
+        } else {
+            clearInterval(studentsInterval);
+
+            // بعد اكتمال شريط التقدم، اعمل login
+            if(!students[studentName]) students[studentName] = {points:0, moods:[], messages:[], lastMood:'neutral'};
+            document.getElementById('loginPage').style.display='none';
+            document.getElementById('app').style.display='block';
+            document.getElementById('welcome').innerText = `Hi ${studentName}!`;
+        }
+    }, 50); // 50ms بين كل زيادة → يستغرق 1 ثانية تقريباً
+}
+
+// ---- Language Switch ----
+function updateLanguage(){
+    currentLang = document.getElementById('lang').value;
+    document.getElementById('title').innerText = translations[currentLang].title;
+    document.getElementById('loginBtn').innerText = translations[currentLang].login;
+    document.getElementById('studentName').placeholder = translations[currentLang].placeholder;
+    document.getElementById('sendBtn').innerText = translations[currentLang].send;
+    document.getElementById('filterText').childNodes[0].nodeValue = translations[currentLang].filter+' ';
+    document.getElementById('dashTitle').innerText = translations[currentLang].dashTitle;
+    document.getElementById('thStudent').innerText = translations[currentLang].thStudent;
+    document.getElementById('thRisk').innerText = translations[currentLang].thRisk;
+    document.getElementById('thPoints').innerText = translations[currentLang].thPoints;
+    document.getElementById('thMood').innerText = translations[currentLang].thMood;
+}
+
+// ---- Mood Detection + AI Advice ----
+const moodWords = {happy:['happy','سعيد','heureux','feliz'], sad:['sad','حزين','triste','triste'], angry:['angry','غضبان','en colère','enojado']};
+
+function detectMood(msg){
+    msg = msg.toLowerCase();
+    for(let m in moodWords){ if(moodWords[m].some(w=>msg.includes(w))) return m; }
+    return 'neutral';
+}
+
+function aiPersonalityAdvice(msg,mood){
+    let advice = mood==='happy'? "Keep spreading positivity!": mood==='sad'? "Try to stay positive.": mood==='angry'? "Take a deep breath.": "Stay aware of your feelings.";
+    return advice;
+}
+
+// ---- Chat Functions ----
+function sendMessage(){
+    const msg = document.getElementById('userMessage').value.trim();
+    if(!msg) return;
+    const mood = detectMood(msg);
+    addMessage(msg,'student',mood);
+
+    const advice = aiPersonalityAdvice(msg,mood);
+    setTimeout(()=>addMessage(advice,'bot',mood),500);
+
+    let student = students[studentName];
+    let riskScore = mood==='angry'?80: mood==='sad'?60:20;
+    student.points += riskScore<50?10:0;
+    student.moods.push(riskScore);
+    student.messages.push(msg);
+    student.lastMood = mood;
+
+    updateDashboard();
+    document.getElementById('userMessage').value='';
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// ---- Add Message ----
+function addMessage(text,type,mood){
+    const div = document.createElement('div');
+    div.className = `message ${type}`;
+    div.innerHTML = `${moodIcons[mood]||''} ${text}`;
+    chatBox.appendChild(div);
+}
+
+// ---- Dashboard ----
+function updateDashboard(){
+    document.getElementById('dashboard').style.display='block';
+    updateStudentTable();
+    updateMoodChart();
+}
+
+function updateStudentTable(){
+    const filter = document.getElementById('riskFilter').value;
+    const tbody = document.getElementById('studentTable');
+    tbody.innerHTML='';
+    for(let s in students){
+        let student = students[s];
+        let riskLevel = student.moods.length>0? (student.moods[student.moods.length-1]<40?'Low':student.moods[student.moods.length-1]<70?'Medium':'High'):'Low';
+        if(filter!=='all' && filter!==riskLevel) continue;
+        let tr = document.createElement('tr');
+        tr.innerHTML = `<td>${s}</td><td>${riskLevel}</td><td>${student.points}</td><td>${moodIcons[student.lastMood]}</td>`;
+        tbody.appendChild(tr);
+    }
+}
+
+function updateMoodChart(){
+    const student = students[studentName];
+    if(!student) return;
+    const ctx = document.getElementById('moodChart').getContext('2d');
+    if(window.moodChart) window.moodChart.destroy();
+    window.moodChart = new Chart(ctx,{
+        type:'line',
+        data:{
+            labels: student.moods.map((v,i)=>`Msg ${i+1}`),
+            datasets:[{
+                label:'Mood Trend (Risk Score)',
+                data: student.moods,
+                borderColor:'#2f7ee6',
+                backgroundColor:'rgba(47,126,230,0.2)',
+                fill:true,
+                tension:0.3
+            }]
+        },
+        options:{ responsive:true, plugins:{ legend:{ display:false }}, scales:{ y:{min:0,max:100}} }
+    });
+}
+</script>
+
+</body>
+</html>
