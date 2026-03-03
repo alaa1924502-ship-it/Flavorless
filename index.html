@@ -9,10 +9,10 @@
 
 <div class="container">
     <div class="mission">
-        <h3>🌍 Together for Peace</h3>
+        <h3> Together for Peace</h3>
         <p>Say NO to bullying. Say YES to kindness.</p>
         <div class="icons-row">
-            🕊️ ✌️ 🤝 🚫😡 🌿
+           
         </div>
     </div>
 
@@ -41,7 +41,7 @@
         <button onclick="sendMessage()" id="sendBtn">Send</button>
 
         <div class="dashboard" id="dashboard">
-            <h3 id="dashTitle">📊 Counselor Dashboard</h3>
+            <h3 id="dashTitle"> Counselor Dashboard</h3>
             <p id="filterText">Filter by Risk Level: 
                 <select id="riskFilter" onchange="updateStudentTable()">
                     <option value="all">All</option>
@@ -67,27 +67,27 @@
 let currentLang = 'en';
 let studentName = '';
 let students = {}; // All students data
-const moodIcons = {happy:'😊', sad:'😔', angry:'😡', neutral:'😐'};
+const moodIcons = {happy:'', sad:'', angry:'', neutral:''};
 
 const translations = {
 en:{
 title:"Welcome to BrightMind", login:"Log In", placeholder:"Enter your name", send:"Send",
-filter:"Filter by Risk Level:", dashTitle:"📊 Counselor Dashboard",
+filter:"Filter by Risk Level:", dashTitle:" Counselor Dashboard",
 thStudent:"Student", thRisk:"Risk", thPoints:"Points", thMood:"Last Mood"
 },
 ar:{
 title:"مرحبًا بك في BrightMind", login:"تسجيل الدخول", placeholder:"ادخل اسمك", send:"إرسال",
-filter:"تصفية حسب مستوى الخطر:", dashTitle:"📊 لوحة المستشار",
+filter:"تصفية حسب مستوى الخطر:", dashTitle:" لوحة المستشار",
 thStudent:"الطالب", thRisk:"الخطر", thPoints:"النقاط", thMood:"آخر مزاج"
 },
 fr:{
 title:"Bienvenue sur BrightMind", login:"Connexion", placeholder:"Entrez votre nom", send:"Envoyer",
-filter:"Filtrer par niveau de risque:", dashTitle:"📊 Tableau du conseiller",
+filter:"Filtrer par niveau de risque:", dashTitle:" Tableau du conseiller",
 thStudent:"Étudiant", thRisk:"Risque", thPoints:"Points", thMood:"Dernier humeur"
 },
 es:{
 title:"Bienvenido a BrightMind", login:"Iniciar sesión", placeholder:"Ingrese su nombre", send:"Enviar",
-filter:"Filtrar por nivel de riesgo:", dashTitle:"📊 Panel del consejero",
+filter:"Filtrar por nivel de riesgo:", dashTitle:" Panel del consejero",
 thStudent:"Estudiante", thRisk:"Riesgo", thPoints:"Puntos", thMood:"Último estado de ánimo"
 }
 };
@@ -223,3 +223,4 @@ function updateMoodChart(){
 </body>
 
 </html>
+
