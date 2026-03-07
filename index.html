@@ -21,19 +21,8 @@
         <input type="text" id="studentName" placeholder="Enter your name">
         <button onclick="login()" id="loginBtn">Log In</button>
     </div>
-<progress id="loginProgress" value="0" max="100" style="width:70%; display:none;"></progress>
 <progress id="loginProgress" value="0" max="100" style="width:70%; display:none; height:15px; border-radius:8px;"></progress>
  
-    <div id="app" style="display:none;">
-        <div id="header">
-            <span id="welcome"></span>
-            <select id="lang" onchange="updateLanguage()">
-                <option value="en">English</option>
-                <option value="ar">عربي</option>
-                <option value="fr">Français</option>
-                <option value="es">Español</option>
-            </select>
-        </div>
 
         <div id="chatBox"></div>
         <input type="text" id="userMessage" placeholder="Type your message...">
@@ -56,7 +45,6 @@
                     <tbody id="studentTable"></tbody>
                 </table>
             </div>
-            <canvas id="moodChart" width="600" height="200"></canvas>
         </div>
     </div>
 </div>
@@ -92,19 +80,6 @@ function login(){
 }
 
 
-const moodWords = {happy:['happy','سعيد','heureux','feliz'], sad:['sad','حزين','triste','triste'], angry:['angry','غضبان','en colère','enojado']};
-
-function detectMood(msg){
-    msg = msg.toLowerCase();
-    for(let m in moodWords){ if(moodWords[m].some(w=>msg.includes(w))) return m; }
-    return 'neutral';
-}
-
-function aiPersonalityAdvice(msg,mood){
-    let advice = mood==='happy'? "Keep spreading positivity!": mood==='sad'? "Try to stay positive.": mood==='angry'? "Take a deep breath.": "Stay aware of your feelings.";
-    return advice;
-}
-
 function sendMessage(){
     const msg = document.getElementById('userMessage').value.trim();
     if(!msg) return;
@@ -132,16 +107,9 @@ function addMessage(text,type,mood){
     div.innerHTML = `${moodIcons[mood]||''} ${text}`;
     chatBox.appendChild(div);
 }
-
-function updateDashboard(){
-    document.getElementById('dashboard').style.display='block';
-    updateStudentTable();
-    updateMoodChart();
-}
-
-
 </script>
 </body>
 </html>
+
 
 
